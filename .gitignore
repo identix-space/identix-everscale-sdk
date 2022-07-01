@@ -1,0 +1,13 @@
+node_modules
+.idea/
+.env
+.vscode/
+.DS_Store
+.build/
+coverage
+.secrets/
+files/
+!src/modules/files/
+!src/tests/e2e/files/
+tmp/
+e2e-tests-files/

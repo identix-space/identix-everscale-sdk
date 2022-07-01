@@ -1,0 +1,7 @@
+**/node_modules/*
+**/.infra/*
+**/.idea/*
+yarn.lock
+.gitignore
+package.json
+
