@@ -33,20 +33,22 @@ export class EverscaleClientTransactionsService extends EverscaleClientBaseServi
   async checkTokensTransactions(
     address: string,
     tokens: CheckTokenTransactionType[],
-    lookLastTransactionsNumber = 1000,
-    lookPeriodAgoInSec = 3600,
+    lookLastTransactionsNumber?: number,
+    lookPeriodAgoInSec?: number,
   ): Promise<boolean> {
     for await (const token of tokens) {
-      const { title: tokenTitle, ownerTransferType, operationKind } = token;
+      const { title: tokenTitle, ownerTransferType, operationKind, contragent } = token;
 
-      const defaultLookLastTransactionsNumber =
-        this.everscaleClientConfig?.api?.tokens?.lookLastTransactionsNumber || 1000;
-      const defaultLookPeriodAgoInSec =
-        this.everscaleClientConfig?.api?.tokens?.lookPeriodAgoInSec || 600;
+      const applyLookLastTransactionsNumber =
+        lookLastTransactionsNumber ||
+        this.everscaleClientConfig?.api?.tokens?.lookLastTransactionsNumber ||
+        1000;
+      const applyLookPeriodAgoInSec =
+        lookPeriodAgoInSec || this.everscaleClientConfig?.api?.tokens?.lookPeriodAgoInSec || 600;
 
       const tokenTransactions = await this.getTokenTransactions(
         tokenTitle,
-        lookLastTransactionsNumber || defaultLookLastTransactionsNumber,
+        applyLookLastTransactionsNumber,
       );
 
       const userTokenTransactions =
@@ -58,13 +60,23 @@ export class EverscaleClientTransactionsService extends EverscaleClientBaseServi
                 : transaction.receiver?.ownerAddress;
 
             const checkTransactionInSearchPeriod =
-              new Date().getTime() - transaction.blockTime <
-              (lookPeriodAgoInSec || defaultLookPeriodAgoInSec) * 1000;
+              new Date().getTime() - transaction.blockTime < applyLookPeriodAgoInSec * 1000;
+
+            let checkContragent = true;
+            if (contragent) {
+              const transactionContragentAddress =
+                ownerTransferType === 'send'
+                  ? transaction.receiver?.ownerAddress
+                  : transaction.sender?.ownerAddress;
+
+              checkContragent = contragent === transactionContragentAddress
+            }
 
             return (
               transactionOwnerAddress === address &&
               transaction.kind === operationKind &&
-              checkTransactionInSearchPeriod
+              checkTransactionInSearchPeriod &&
+              checkContragent
             );
           })) ||
         [];

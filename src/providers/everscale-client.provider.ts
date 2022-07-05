@@ -96,8 +96,8 @@ function everscaleClientFactory(
     checkTokensTransactions(
       address: string,
       tokens: CheckTokenTransactionType[],
-      lookLastTransactionsNumber = 1000,
-      lookPeriodAgoInSec = 3600,
+      lookLastTransactionsNumber?: number,
+      lookPeriodAgoInSec?: number,
     ): Promise<boolean> {
       return everscaleClientTransactionsService.checkTokensTransactions(
         address,

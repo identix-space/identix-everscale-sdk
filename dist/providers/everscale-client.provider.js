@@ -53,7 +53,7 @@ function everscaleClientFactory(everscaleClientConfig, everscaleClientDidService
         transferTip3Tokens(address, amount, token) {
             return everscaleClientTransfersService.transferTip3Tokens(address, amount, token);
         },
-        checkTokensTransactions(address, tokens, lookLastTransactionsNumber = 1000, lookPeriodAgoInSec = 3600) {
+        checkTokensTransactions(address, tokens, lookLastTransactionsNumber, lookPeriodAgoInSec) {
             return everscaleClientTransactionsService.checkTokensTransactions(address, tokens, lookLastTransactionsNumber, lookPeriodAgoInSec);
         },
     };

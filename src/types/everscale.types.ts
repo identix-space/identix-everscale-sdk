@@ -124,6 +124,7 @@ export type CheckTokenTransactionType = {
   title: string;
   ownerTransferType: 'send' | 'receive';
   operationKind: 'send' | 'receive' | 'mint';
+  contragent?: string;
 };
 
 export interface IEverscaleTransactionsSearchParams extends IBaseTransactionsSearchParams {

@@ -41,16 +41,18 @@ let EverscaleClientTransactionsService = class EverscaleClientTransactionsServic
         const transactions = (0, object_helpers_1.get)(response.data, 'transactions');
         return Array.isArray(transactions) ? transactions : [];
     }
-    async checkTokensTransactions(address, tokens, lookLastTransactionsNumber = 1000, lookPeriodAgoInSec = 3600) {
+    async checkTokensTransactions(address, tokens, lookLastTransactionsNumber, lookPeriodAgoInSec) {
         var e_1, _a;
         var _b, _c, _d, _e, _f, _g;
         try {
             for (var tokens_1 = __asyncValues(tokens), tokens_1_1; tokens_1_1 = await tokens_1.next(), !tokens_1_1.done;) {
                 const token = tokens_1_1.value;
                 const { title: tokenTitle, ownerTransferType, operationKind } = token;
-                const defaultLookLastTransactionsNumber = ((_d = (_c = (_b = this.everscaleClientConfig) === null || _b === void 0 ? void 0 : _b.api) === null || _c === void 0 ? void 0 : _c.tokens) === null || _d === void 0 ? void 0 : _d.lookLastTransactionsNumber) || 1000;
-                const defaultLookPeriodAgoInSec = ((_g = (_f = (_e = this.everscaleClientConfig) === null || _e === void 0 ? void 0 : _e.api) === null || _f === void 0 ? void 0 : _f.tokens) === null || _g === void 0 ? void 0 : _g.lookPeriodAgoInSec) || 600;
-                const tokenTransactions = await this.getTokenTransactions(tokenTitle, lookLastTransactionsNumber || defaultLookLastTransactionsNumber);
+                const applyLookLastTransactionsNumber = lookLastTransactionsNumber ||
+                    ((_d = (_c = (_b = this.everscaleClientConfig) === null || _b === void 0 ? void 0 : _b.api) === null || _c === void 0 ? void 0 : _c.tokens) === null || _d === void 0 ? void 0 : _d.lookLastTransactionsNumber) ||
+                    1000;
+                const applyLookPeriodAgoInSec = lookPeriodAgoInSec || ((_g = (_f = (_e = this.everscaleClientConfig) === null || _e === void 0 ? void 0 : _e.api) === null || _f === void 0 ? void 0 : _f.tokens) === null || _g === void 0 ? void 0 : _g.lookPeriodAgoInSec) || 600;
+                const tokenTransactions = await this.getTokenTransactions(tokenTitle, applyLookLastTransactionsNumber);
                 const userTokenTransactions = (Array.isArray(tokenTransactions) &&
                     tokenTransactions.filter((transaction) => {
                         var _a, _b;
@@ -58,7 +60,7 @@ let EverscaleClientTransactionsService = class EverscaleClientTransactionsServic
                             ? (_a = transaction.sender) === null || _a === void 0 ? void 0 : _a.ownerAddress
                             : (_b = transaction.receiver) === null || _b === void 0 ? void 0 : _b.ownerAddress;
                         const checkTransactionInSearchPeriod = new Date().getTime() - transaction.blockTime <
-                            (lookPeriodAgoInSec || defaultLookPeriodAgoInSec) * 1000;
+                            applyLookPeriodAgoInSec * 1000;
                         return (transactionOwnerAddress === address &&
                             transaction.kind === operationKind &&
                             checkTransactionInSearchPeriod);
